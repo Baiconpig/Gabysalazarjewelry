@@ -133,6 +133,7 @@ body.admin-system::before {
     background: rgba(3, 17, 13, 0.42);
     box-shadow: 0 10px 34px rgba(3, 17, 13, 0.12);
     backdrop-filter: blur(14px);
+    animation: nav-drop-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .public-nav-inner {
@@ -153,6 +154,7 @@ body.admin-system::before {
 }
 
 .public-nav-logo {
+    position: relative;
     width: min(68px, 7vw);
     min-height: 46px;
     display: grid;
@@ -162,6 +164,7 @@ body.admin-system::before {
     font-size: 15px;
     letter-spacing: 0.32em;
     text-transform: uppercase;
+    transition: transform 260ms ease, filter 260ms ease;
 }
 
 .public-nav-wordmark {
@@ -194,10 +197,12 @@ body.admin-system::before {
         brightness(1.14)
         drop-shadow(0 8px 16px rgba(0, 0, 0, 0.44))
         drop-shadow(0 0 18px rgba(227, 164, 123, 0.42));
+    animation: logo-breathe 4.8s ease-in-out infinite;
 }
 
 .public-nav-logo:hover {
     color: #e3a47b;
+    transform: translateY(-1px) scale(1.08);
 }
 
 .public-nav-logo-mark {
@@ -237,6 +242,7 @@ body.admin-system::before {
 }
 
 .public-nav-link {
+    position: relative;
     flex: 0 0 auto;
     padding: 7px 0;
     border-radius: 0;
@@ -247,12 +253,34 @@ body.admin-system::before {
     line-height: 1;
     text-shadow: none;
     white-space: nowrap;
+    animation: nav-item-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
     transition: color 180ms ease, transform 180ms ease;
+}
+
+.public-nav-link::after,
+.public-action-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: #e3a47b;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 220ms ease;
 }
 
 .public-nav-link:hover {
     color: #e3a47b;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+}
+
+.public-nav-link:hover::after,
+.public-nav-link.is-active::after,
+.public-action-link:hover::after,
+.public-action-link.is-active::after {
+    transform: scaleX(1);
 }
 
 .public-nav-link.is-active {
@@ -268,6 +296,7 @@ body.admin-system::before {
 }
 
 .public-action-link {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -277,6 +306,7 @@ body.admin-system::before {
     font-weight: 800;
     text-shadow: none;
     white-space: nowrap;
+    animation: nav-item-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
     transition: color 180ms ease, transform 180ms ease;
 }
 
@@ -291,7 +321,72 @@ body.admin-system::before {
 .public-action-link:hover,
 .public-action-link.is-active {
     color: #e3a47b;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+}
+
+.public-nav-links-left .public-nav-link:nth-child(1) { animation-delay: 80ms; }
+.public-nav-links-left .public-nav-link:nth-child(2) { animation-delay: 130ms; }
+.public-nav-links-left .public-nav-link:nth-child(3) { animation-delay: 180ms; }
+.public-nav-links-left .public-nav-link:nth-child(4) { animation-delay: 230ms; }
+.public-nav-links-left .public-nav-link:nth-child(5) { animation-delay: 280ms; }
+.public-nav-logo { animation: nav-item-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both; }
+.public-nav-links-right .public-nav-link:nth-child(1) { animation-delay: 180ms; }
+.public-nav-links-right .public-nav-link:nth-child(2) { animation-delay: 230ms; }
+.public-nav-actions .public-action-link:nth-child(1) { animation-delay: 260ms; }
+.public-nav-actions .public-action-link:nth-child(2) { animation-delay: 310ms; }
+.public-nav-actions .public-action-link:nth-child(3) { animation-delay: 360ms; }
+.public-nav-actions .public-action-link:nth-child(4) { animation-delay: 410ms; }
+
+@keyframes nav-drop-in {
+    from {
+        opacity: 0;
+        transform: translateY(-18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes nav-item-rise {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes logo-breathe {
+    0%, 100% {
+        filter:
+            saturate(1.45)
+            contrast(1.18)
+            brightness(1.14)
+            drop-shadow(0 8px 16px rgba(0, 0, 0, 0.44))
+            drop-shadow(0 0 18px rgba(227, 164, 123, 0.42));
+    }
+    50% {
+        filter:
+            saturate(1.62)
+            contrast(1.22)
+            brightness(1.24)
+            drop-shadow(0 10px 18px rgba(0, 0, 0, 0.44))
+            drop-shadow(0 0 24px rgba(227, 164, 123, 0.58));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .public-nav-shell,
+    .public-nav-logo,
+    .public-nav-logo img,
+    .public-nav-link,
+    .public-action-link {
+        animation: none;
+        transition: none;
+    }
 }
 
 .public-nav-cta,
