@@ -10,21 +10,49 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RequestReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PublicPageController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [PublicPageController::class, 'home'])->name('home');
-Route::get('/historia-de-la-marca', [PublicPageController::class, 'history'])->name('public.history');
-Route::get('/catalogo-de-joyas', [PublicPageController::class, 'catalog'])->name('public.catalog');
-Route::get('/galerias-de-colecciones', [PublicPageController::class, 'collections'])->name('public.collections');
-Route::get('/custom-made', [PublicPageController::class, 'customMade'])->name('public.custom-made');
-Route::get('/piezas-personalizadas', [PublicPageController::class, 'customRequest'])->name('public.custom-request');
-Route::post('/piezas-personalizadas', [PublicPageController::class, 'storeCustomRequest'])->name('public.custom-request.store');
-Route::get('/agenda-de-citas', [PublicPageController::class, 'appointments'])->name('public.appointments');
-Route::post('/agenda-de-citas', [PublicPageController::class, 'storeAppointment'])->name('public.appointments.store');
-Route::get('/instagram', [PublicPageController::class, 'instagram'])->name('public.instagram');
-Route::get('/testimonios', [PublicPageController::class, 'testimonials'])->name('public.testimonials');
-Route::get('/contacto', [PublicPageController::class, 'contact'])->name('public.contact');
-Route::post('/contacto', [PublicPageController::class, 'storeContact'])->name('public.contact.store');
+Route::get('/acceso-preview', fn () => view('auth.public-preview'))->name('public.preview.login');
+Route::post('/acceso-preview', function (Request $request) {
+    $credentials = $request->validate([
+        'username' => ['required', 'string'],
+        'password' => ['required', 'string'],
+    ]);
+
+    $expectedUser = (string) config('public-preview.username');
+    $expectedPassword = (string) config('public-preview.password');
+
+    if (
+        ! hash_equals($expectedUser, $credentials['username'])
+        || ! hash_equals($expectedPassword, $credentials['password'])
+    ) {
+        return back()
+            ->withErrors(['username' => 'El usuario o la contrasena no son correctos.'])
+            ->onlyInput('username');
+    }
+
+    $request->session()->put('public_preview_authenticated', true);
+    $request->session()->regenerate();
+
+    return redirect()->intended(route('home'));
+})->name('public.preview.store');
+
+Route::middleware('public.preview')->group(function () {
+    Route::get('/', [PublicPageController::class, 'home'])->name('home');
+    Route::get('/historia-de-la-marca', [PublicPageController::class, 'history'])->name('public.history');
+    Route::get('/catalogo-de-joyas', [PublicPageController::class, 'catalog'])->name('public.catalog');
+    Route::get('/galerias-de-colecciones', [PublicPageController::class, 'collections'])->name('public.collections');
+    Route::get('/custom-made', [PublicPageController::class, 'customMade'])->name('public.custom-made');
+    Route::get('/piezas-personalizadas', [PublicPageController::class, 'customRequest'])->name('public.custom-request');
+    Route::post('/piezas-personalizadas', [PublicPageController::class, 'storeCustomRequest'])->name('public.custom-request.store');
+    Route::get('/agenda-de-citas', [PublicPageController::class, 'appointments'])->name('public.appointments');
+    Route::post('/agenda-de-citas', [PublicPageController::class, 'storeAppointment'])->name('public.appointments.store');
+    Route::get('/instagram', [PublicPageController::class, 'instagram'])->name('public.instagram');
+    Route::get('/testimonios', [PublicPageController::class, 'testimonials'])->name('public.testimonials');
+    Route::get('/contacto', [PublicPageController::class, 'contact'])->name('public.contact');
+    Route::post('/contacto', [PublicPageController::class, 'storeContact'])->name('public.contact.store');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
